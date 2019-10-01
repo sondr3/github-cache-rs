@@ -12,5 +12,13 @@ query ContributionsQuery($login: String!) {
                 }
             }
         }
+        repositories(first: 50, privacy: PUBLIC, isFork: false) {
+            nodes {
+                name
+                stargazers {
+                    totalCount
+                }
+            }
+        }
     }
 }

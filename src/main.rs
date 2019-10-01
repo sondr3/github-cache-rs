@@ -4,7 +4,7 @@ use serde::Deserialize;
 
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "queries/github-schema.graphql",
+    schema_path = "queries/schema.json",
     query_path = "queries/ContributionsQuery.graphql",
     response_derives = "Debug"
 )]
@@ -38,7 +38,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .send()?;
 
     let response_body: Response<contributions_query::ResponseData> = resp.json()?;
-    println!("{:#?}", response_body);
+    let data = response_body.data.expect("missing data");
+
+    println!("{:#?}", data);
 
     Ok(())
 }
