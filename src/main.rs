@@ -1,6 +1,6 @@
 use dotenv::dotenv;
 use graphql_client::{GraphQLQuery, Response};
-use std::env;
+use serde::Deserialize;
 
 #[derive(GraphQLQuery)]
 #[graphql(
@@ -8,29 +8,32 @@ use std::env;
     query_path = "queries/ContributionsQuery.graphql",
     response_derives = "Debug"
 )]
-pub struct ContributionsQuery;
+struct ContributionsQuery;
+
+#[derive(Deserialize, Debug)]
+struct Config {
+    token: String,
+    username: String,
+}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
 
-    let token = match env::var("TOKEN") {
-        Ok(val) => val,
-        Err(_) => panic!("No token available!"),
+    let config: Config = match envy::from_env() {
+        Ok(config) => config,
+        Err(err) => panic!("{:?}", err),
     };
 
-    let username = match env::var("USERNAME") {
-        Ok(val) => val,
-        Err(_) => panic!("No token available!"),
-    };
+    println!("{:?}", config);
 
-    println!("{:?}", token);
-
-    let query = ContributionsQuery::build_query(contributions_query::Variables { login: username });
+    let query = ContributionsQuery::build_query(contributions_query::Variables {
+        login: config.username,
+    });
 
     let client = reqwest::Client::new();
     let mut resp = client
         .post("https://api.github.com/graphql")
-        .bearer_auth(token)
+        .bearer_auth(config.token)
         .json(&query)
         .send()?;
 
