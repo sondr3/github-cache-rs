@@ -1,7 +1,7 @@
 with import <nixpkgs> {};
 
 stdenv.mkDerivation {
-  name = "git-ignore";
+  name = "github-cache-rs";
   buildInputs = with pkgs; [
     pkgconfig
     openssl
