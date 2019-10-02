@@ -1,7 +1,7 @@
 mod github;
 
 use dotenv::dotenv;
-use github::{Contribution, User, Week};
+use github::User;
 use graphql_client::{GraphQLQuery, Response};
 use serde::Deserialize;
 
@@ -43,38 +43,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let response_body: Response<contributions_query::ResponseData> = resp.json()?;
     let data = response_body.data.expect("missing data").user.unwrap();
     let contributions = data.contributions_collection.contribution_calendar;
-    let repositories = &data.repositories;
+    let repositories = data.repositories;
 
-    let mut user = User::new();
-
-    user.contributions.total_contributions = contributions.total_contributions;
-    for color in &mut contributions.colors.into_iter() {
-        user.contributions.colors.push(color);
-    }
-
-    for (i, week) in &mut contributions.weeks.into_iter().enumerate() {
-        let mut w = Week::new();
-
-        for (d, contrib) in week.contribution_days.iter().enumerate() {
-            w.days.insert(
-                d,
-                Contribution::new(contrib.contribution_count, contrib.color.to_owned()),
-            );
-        }
-        user.contributions.weeks.insert(i, w);
-    }
-
-    for node in &mut repositories
-        .nodes
-        .as_ref()
-        .expect("Missing repository nodes")
-        .iter()
-    {
-        if let Some(node) = node {
-            user.repositories
-                .insert(node.name.to_owned(), node.stargazers.total_count);
-        }
-    }
+    let user = User::from_response(contributions, repositories);
 
     println!("{:#?}", user);
 
