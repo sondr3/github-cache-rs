@@ -1,7 +1,9 @@
+mod github;
+
 use dotenv::dotenv;
+use github::{Contribution, User, Week};
 use graphql_client::{GraphQLQuery, Response};
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use serde::Deserialize;
 
 #[derive(GraphQLQuery)]
 #[graphql(
@@ -15,67 +17,6 @@ struct ContributionsQuery;
 struct Config {
     token: String,
     username: String,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-struct User {
-    contributions: ContributionCollection,
-    repositories: HashMap<String, i64>,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-struct ContributionCollection {
-    #[serde(rename = "totalContributions")]
-    total_contributions: i64,
-    colors: Vec<String>,
-    weeks: HashMap<usize, Week>,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-struct Week {
-    days: HashMap<usize, Contribution>,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-struct Contribution {
-    contribution_count: i64,
-    color: String,
-}
-
-impl User {
-    fn new() -> Self {
-        User {
-            contributions: ContributionCollection::new(),
-            repositories: HashMap::new(),
-        }
-    }
-}
-
-impl ContributionCollection {
-    fn new() -> Self {
-        ContributionCollection {
-            total_contributions: 0,
-            colors: Vec::new(),
-            weeks: HashMap::new(),
-        }
-    }
-}
-
-impl Week {
-    fn new() -> Self {
-        Week {
-            days: HashMap::new(),
-        }
-    }
-}
-
-impl Contribution {
-    fn new(contribution_count: i64, color: String) -> Self {
-        Contribution {
-            contribution_count,
-            color,
-        }
-    }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
