@@ -38,9 +38,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .send()?;
 
     let response_body: Response<contributions_query::ResponseData> = resp.json()?;
-    let data = response_body.data.expect("missing data");
+    let data = response_body.data.expect("missing data").user.unwrap();
 
-    println!("{:#?}", data);
+    let contributions = data.contributions_collection.contribution_calendar;
+
+    let repositories = &data.repositories;
+
+    println!("{:#?}", contributions);
+    println!("{:#?}", repositories);
 
     Ok(())
 }
