@@ -1,17 +1,10 @@
 mod github;
+mod query;
 
+use crate::query::GithubResponse;
 use dotenv::dotenv;
 use github::User;
-use graphql_client::{GraphQLQuery, Response};
 use serde::Deserialize;
-
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "queries/schema.json",
-    query_path = "queries/ContributionsQuery.graphql",
-    response_derives = "Debug"
-)]
-struct ContributionsQuery;
 
 #[derive(Deserialize, Debug)]
 struct Config {
@@ -29,23 +22,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("{:?}", config);
 
-    let query = ContributionsQuery::build_query(contributions_query::Variables {
-        login: config.username,
-    });
-
-    let client = reqwest::Client::new();
-    let mut resp = client
-        .post("https://api.github.com/graphql")
-        .bearer_auth(config.token)
-        .json(&query)
-        .send()?;
-
-    let response_body: Response<contributions_query::ResponseData> = resp.json()?;
-    let data = response_body.data.expect("missing data").user.unwrap();
-    let contributions = data.contributions_collection.contribution_calendar;
-    let repositories = data.repositories;
-
-    let user = User::from_response(contributions, repositories);
+    let response = GithubResponse::query(config.username, config.token)?;
+    let user = User::from_response(response);
 
     println!("{:#?}", user);
 

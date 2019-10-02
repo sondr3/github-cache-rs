@@ -1,7 +1,4 @@
-use crate::{
-    contributions_query::ContributionsQueryUserContributionsCollectionContributionCalendar,
-    contributions_query::ContributionsQueryUserRepositories,
-};
+use crate::query::GithubResponse;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -38,18 +35,15 @@ impl User {
         }
     }
 
-    pub fn from_response(
-        contributions: ContributionsQueryUserContributionsCollectionContributionCalendar,
-        repositories: ContributionsQueryUserRepositories,
-    ) -> Self {
+    pub fn from_response(response: GithubResponse) -> Self {
         let mut user = User::new();
 
-        user.contributions.total_contributions = contributions.total_contributions;
-        for color in &mut contributions.colors.into_iter() {
+        user.contributions.total_contributions = response.contributions.total_contributions;
+        for color in &mut response.contributions.colors.into_iter() {
             user.contributions.colors.push(color);
         }
 
-        for (i, week) in &mut contributions.weeks.into_iter().enumerate() {
+        for (i, week) in &mut response.contributions.weeks.into_iter().enumerate() {
             let mut w = Week::new();
 
             for (d, contrib) in week.contribution_days.iter().enumerate() {
@@ -61,7 +55,8 @@ impl User {
             user.contributions.weeks.insert(i, w);
         }
 
-        for node in &mut repositories
+        for node in &mut response
+            .repositories
             .nodes
             .as_ref()
             .expect("Missing repository nodes")
