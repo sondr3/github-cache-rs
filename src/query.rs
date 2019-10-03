@@ -19,9 +19,10 @@ pub struct GithubResponse {
 }
 
 impl GithubResponse {
-    pub fn query(username: String, token: String) -> Result<Self, Box<dyn std::error::Error>> {
-        let query =
-            ContributionsQuery::build_query(contributions_query::Variables { login: username });
+    pub fn query(username: &str, token: &str) -> Result<Self, Box<dyn std::error::Error>> {
+        let query = ContributionsQuery::build_query(contributions_query::Variables {
+            login: username.into(),
+        });
 
         let client = reqwest::Client::new();
         let mut resp = client

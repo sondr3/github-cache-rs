@@ -11,16 +11,9 @@ use crate::query::GithubResponse;
 use dotenv::dotenv;
 use github::User;
 use serde::Deserialize;
-use std::sync::Mutex;
-
-type AppState = Mutex<User>;
-
-impl AppState {
-    fn new() -> Self {}
-}
 
 #[derive(Deserialize, Debug)]
-struct Config {
+pub struct Config {
     token: String,
     username: String,
 }
@@ -33,14 +26,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Err(err) => panic!("{:?}", err),
     };
 
-    println!("{:?}", config);
-
-    let response = GithubResponse::query(config.username, config.token)?;
-    let user = User::from_response(response);
-
-    println!("{:#?}", user);
-
-    server::run();
+    server::run(config);
 
     Ok(())
 }

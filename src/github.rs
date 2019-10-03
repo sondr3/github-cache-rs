@@ -2,13 +2,15 @@ use crate::query::GithubResponse;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Deserialize, Serialize, Debug)]
+pub type Repositories = HashMap<String, i64>;
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct User {
     pub contributions: ContributionCollection,
-    pub repositories: HashMap<String, i64>,
+    pub repositories: Repositories,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ContributionCollection {
     #[serde(rename = "totalContributions")]
     pub total_contributions: i64,
@@ -16,12 +18,12 @@ pub struct ContributionCollection {
     pub weeks: HashMap<usize, Week>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Week {
     pub days: HashMap<usize, Contribution>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Contribution {
     pub contribution_count: i64,
     pub color: String,
