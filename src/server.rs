@@ -39,20 +39,23 @@ fn get_user(config: &Config) -> User {
 
 pub fn run(config: Config) {
     let (sender, receiver) = channel();
-    rocket::ignite()
-        .manage(AppState::new(Mutex::new(get_user(&config))))
-        .mount("/", routes![index, contributions, repositories])
-        .launch();
+    let config_clone = config.clone();
+
+    thread::spawn(move || {
+        rocket::ignite()
+            .manage(AppState::new(Mutex::new(get_user(&config_clone))))
+            .mount("/", routes![index, contributions, repositories])
+            .launch();
+    });
 
     thread::spawn(move || loop {
         sender
             .send(get_user(&config))
             .expect("Could not send to thread");
-        println!("I AM DOING SOMETHING");
-        thread::sleep(Duration::from_secs(3));
+        thread::sleep(Duration::from_secs(3600));
     });
 
     loop {
-        let _ = receiver.try_recv().map(|r| println!("{:?}", r));
+        let _ = receiver.try_recv();
     }
 }

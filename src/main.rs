@@ -12,7 +12,7 @@ use dotenv::dotenv;
 use github::User;
 use serde::Deserialize;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct Config {
     token: String,
     username: String,
