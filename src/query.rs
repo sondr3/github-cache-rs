@@ -4,6 +4,8 @@ use crate::{
 };
 use graphql_client::{GraphQLQuery, Response};
 
+type Date = String;
+
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "queries/schema.json",

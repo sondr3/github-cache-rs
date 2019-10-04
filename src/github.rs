@@ -27,6 +27,7 @@ pub struct Week {
 pub struct Contribution {
     pub contribution_count: i64,
     pub color: String,
+    pub date: String,
 }
 
 impl User {
@@ -51,7 +52,11 @@ impl User {
             for (d, contrib) in week.contribution_days.iter().enumerate() {
                 w.days.insert(
                     d,
-                    Contribution::new(contrib.contribution_count, contrib.color.to_owned()),
+                    Contribution::new(
+                        contrib.contribution_count,
+                        contrib.color.to_owned(),
+                        contrib.date.to_owned(),
+                    ),
                 );
             }
             user.contributions.weeks.insert(i, w);
@@ -93,10 +98,11 @@ impl Week {
 }
 
 impl Contribution {
-    fn new(contribution_count: i64, color: String) -> Self {
+    fn new(contribution_count: i64, color: String, date: String) -> Self {
         Contribution {
             contribution_count,
             color,
+            date,
         }
     }
 }
