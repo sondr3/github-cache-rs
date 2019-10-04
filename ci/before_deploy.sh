@@ -14,14 +14,9 @@ main() {
 
     test -f Cargo.lock || cargo generate-lockfile
 
-    # due to caching there can be multiple versions of the man pages so we
-    # remove the previous ones before building.
-    rm -f target/$TARGET/release/build/git-ignore-generator-*/out/git-ignore.1
+    cross rustc --bin github-cache-rs --target $TARGET --release -- -C lto
 
-    cross rustc --bin git-ignore --target $TARGET --release -- -C lto
-
-    cp target/$TARGET/release/git-ignore $stage/
-    cp target/$TARGET/release/build/git-ignore-generator-*/out/git-ignore.1 $stage/
+    cp target/$TARGET/release/github-cache-rs $stage/
 
     cd $stage
     tar czf $src/$CRATE_NAME-$TRAVIS_TAG-$TARGET.tar.gz *
