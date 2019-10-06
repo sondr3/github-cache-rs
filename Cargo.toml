@@ -1,6 +1,6 @@
 [package]
 name = "github-cache-rs"
-version = "0.2.2"
+version = "0.3.0"
 authors = ["Sondre Nilsen <nilsen.sondre@gmail.com>"]
 edition = "2018"
 
