@@ -32,9 +32,7 @@ fn repositories(user: State<AppState>) -> Json<Repositories> {
 fn get_user(config: &Config) -> User {
     let response =
         GithubResponse::query(&config.username, &config.token).expect("GitHub API error.");
-    let user = User::from_response(response);
-
-    user
+    User::from_response(response)
 }
 
 pub fn run(config: Config) {
